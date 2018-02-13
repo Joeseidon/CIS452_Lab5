@@ -8,6 +8,12 @@
 
 #define SIZE 4096
 
+char path = "/tmp";
+char id = 'S';
+key_t semkey;
+
+void retrieveSmKey(void);
+
 typedef struct commData{
 	char *msg;
 	int receive1;
@@ -18,6 +24,8 @@ int running = 1;
 
 int main () {
 	commData *data;
+	
+	retrieveSmKey();
 	
 	while(running){
 		
@@ -36,4 +44,11 @@ int main () {
 	}
 	
 	return 0;
+}
+
+void retrieveSmKey(void){
+	if ((semkey = ftok(path, id)) == (key_t) -1) {
+		perror("IPC error: ftok"); 
+		exit(1);
+	}
 }
