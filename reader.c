@@ -52,7 +52,7 @@ void retrieveSmKey(void){
 		exit(1);
 	}
 }
-
+//Need to update the following two functions to use semkey
 void openSharedMemory(void){
 	if ((shmId =
          shmget (IPC_PRIVATE, FOO,
@@ -65,6 +65,7 @@ void openSharedMemory(void){
         exit (1);
     }
 }
+
 
 void closeSharedMemory(void){
 	if (shmdt (shmPtr) < 0) {

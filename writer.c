@@ -56,6 +56,7 @@ void retrieveSmKey(void){
 	}
 }
 
+//Need to update the following two functions to use semkey
 void openSharedMemory(void){
 	if ((shmId =
          shmget (IPC_PRIVATE, FOO,
