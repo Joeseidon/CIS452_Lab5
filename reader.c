@@ -51,7 +51,7 @@ int main () {
 		
 		printf("Waiting for writer .. \n");
 		while(1){
-			delay(1000);
+			sleep(100);
 			printf("%s\n",shmPtr->msg);
 		}
 	
