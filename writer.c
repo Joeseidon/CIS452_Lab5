@@ -26,7 +26,7 @@ typedef struct commData{
 }commData;
 
 commData *data;
-commData *shmPtr;
+void *shmPtr;
 
 int running = 1;
 
@@ -42,7 +42,7 @@ int main () {
 		openSharedMemory();
 		
 		//write to memory
-		strcpy(shmPtr->msg,"This is a test");
+		strcpy(((commData)shmPtr)->msg,"This is a test");
 		
 		
 		
@@ -78,7 +78,7 @@ void openSharedMemory(void){
         perror ("i can't get no..\n");
         exit (1);
     }
-    if ((shmPtr = (commData *) shmat (shmId, 0, 0)) == (commData *) -1) {
+    if ((shmPtr = shmat (shmId, 0, 0)) == (void *) -1) {
         perror ("can't attach\n");
         exit (1);
     }
