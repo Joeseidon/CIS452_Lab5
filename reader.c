@@ -5,7 +5,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <unistd.h>
-#include <errno.h"
+#include <errno.h>
 
 #define CHAR_BUFFER 256
 
