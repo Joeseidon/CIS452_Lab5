@@ -78,7 +78,7 @@ void openSharedMemory(void){
         perror ("i can't get no..\n");
         exit (1);
     }
-    if ((shmPtr = shmat (shmId, 0, 0)) == (void *) -1) {
+    if ((shmPtr = shmat (shmId, NULL, 0)) == (void *) -1) {
         perror ("can't attach\n");
         exit (1);
     }
