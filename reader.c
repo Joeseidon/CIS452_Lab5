@@ -13,7 +13,7 @@
 char path[CHAR_BUFFER];
 int id = 'S';
 int shmId;
-commData *shmPtr;
+
 key_t semkey;
 
 void retrieveSmKey(void);
@@ -28,6 +28,7 @@ typedef struct commData{
 }commData;
 
 commData *data;
+commData *shmPtr;
 
 int running = 1;
 
