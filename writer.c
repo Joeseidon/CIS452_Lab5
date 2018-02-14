@@ -5,13 +5,14 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <unistd.h>
+#include <string.h>
 
 #define CHAR_BUFFER 256
 
 char path[CHAR_BUFFER];
 int id = 'S';
 int shmId;
-char *shmPtr;
+commData *shmPtr;
 key_t semkey;
 
 void retrieveSmKey(void);
@@ -36,6 +37,13 @@ int main () {
 	while(running){
 		
 		printf("Key retrieved: %d\n",semkey);
+		
+		openSharedMemory();
+		
+		//write to memory
+		strcpy(shmPtr->msg,"This is a test");
+		
+		
 		
 		//wait for user input
 		
@@ -69,7 +77,7 @@ void openSharedMemory(void){
         perror ("i can't get no..\n");
         exit (1);
     }
-    if ((shmPtr = shmat (shmId, 0, 0)) == (void *) -1) {
+    if ((shmPtr = (commData *) shmat (shmId, 0, 0)) == (void *) -1) {
         perror ("can't attach\n");
         exit (1);
     }

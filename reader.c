@@ -6,13 +6,14 @@
 #include <sys/shm.h>
 #include <unistd.h>
 #include <errno.h>
+#include <time.h>
 
 #define CHAR_BUFFER 256
 
 char path[CHAR_BUFFER];
 int id = 'S';
 int shmId;
-char *shmPtr;
+commData *shmPtr;
 key_t semkey;
 
 void retrieveSmKey(void);
@@ -37,6 +38,8 @@ int main () {
 	
 	while(running){
 		printf("Key retrieved: %d\n",semkey);
+		
+		openSharedMemory();
 		//check for new input by checking receive flag
 		
 		//print new message
@@ -46,9 +49,10 @@ int main () {
 		//wait till flag reset to 0, indicating new msg
 		
 		printf("Waiting for writer .. \n");
-		while(1)
-			;
-		
+		while(1){
+			delay(1000);
+			printf("%s\n",shmPtr->msg);
+		}
 	
 	}
 	
@@ -68,7 +72,7 @@ void openSharedMemory(void){
         perror ("i can't get no..\n");
         exit (1);
     }
-    if ((shmPtr = shmat (shmId, 0, 0)) == (void *) -1) {
+    if ((shmPtr = (commData *) shmat (shmId, 0, 0)) == (void *) -1) {
         perror ("can't attach\n");
         exit (1);
     }
