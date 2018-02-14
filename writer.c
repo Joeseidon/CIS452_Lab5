@@ -74,7 +74,7 @@ void retrieveSmKey(void){
 
 //Need to update the following two functions to use semkey
 void openSharedMemory(void){
-	if ((shmId = shmget(semkey,sizeof(commData),IPC_CREAT|0666) < 0)) {
+	if ((shmId = shmget(semkey,sizeof(shmPtr),IPC_CREAT|0666) < 0)) {
         perror ("i can't get no..\n");
         exit (1);
     }
