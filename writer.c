@@ -42,7 +42,7 @@ int main () {
 		openSharedMemory();
 		
 		//write to memory
-		//strcpy(((commData)shmPtr)->msg,"This is a test");
+		strcpy(shmPtr->msg,"This is a test");
 		
 		
 		
@@ -79,9 +79,8 @@ void openSharedMemory(void){
         exit (1);
     }
     if ((shmPtr = (commData *)shmat (shmId, NULL, 0)) == (void *) -1) {
-		printf("value mem size: %lu , Required: %lu",((unsigned long)shmPtr - (unsigned long)shmPtr + sizeof(commData)),(unsigned long) sizeof(commData));
         perror ("can't attach\n");
-        exit (1);
+        //exit (1);
     }
 }
 
