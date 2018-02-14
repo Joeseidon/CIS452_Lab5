@@ -74,12 +74,12 @@ void retrieveSmKey(void){
 
 //Need to update the following two functions to use semkey
 void openSharedMemory(void){
-	if ((shmId = shmget(semkey,sizeof(data),IPC_CREAT|0666) < 0)) {
+	if ((shmId = shmget(semkey,sizeof(commData),IPC_CREAT|0666) < 0)) {
         perror ("i can't get no..\n");
         exit (1);
     }
-    shmPtr = (commData *)shmat (shmId, NULL, 0);
-	if((commData)shmPtr == -1) {
+    if ((shmPtr = (commData *)shmat (shmId, NULL, 0)) == (void *) -1) {
+		printf("value mem size: %lu , Required: %lu",((unsigned long)shmPtr - (unsigned long)shmPtr + sizeof(commData)),(unsigned long) sizeof(commData));
         perror ("can't attach\n");
         exit (1);
     }
