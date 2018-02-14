@@ -24,7 +24,9 @@ typedef struct commData{
 	char msg[CHAR_BUFFER];
 	int receive1;
 	int receive2;
-}
+}commData;
+
+commData *data;
 
 int running = 1;
 
@@ -61,9 +63,7 @@ void retrieveSmKey(void){
 }
 //Need to update the following two functions to use semkey
 void openSharedMemory(void){
-	if ((shmId =
-         shmget (IPC_PRIVATE, FOO,
-                 IPC_CREAT | S_IRUSR | S_IWUSR)) < 0) {
+	if ((shmId = shmget(semkey,sizeof(data),IPC_CREAT|0666) < 0)) {
         perror ("i can't get no..\n");
         exit (1);
     }
