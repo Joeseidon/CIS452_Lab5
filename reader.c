@@ -5,10 +5,12 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <unistd.h>
+#include <errno.h"
 
-#define SIZE 4096
+#define CHAR_BUFFER 256
 
-char *path = "/tmp";
+char path[CHAR_BUFFER];
+int id = 'S';
 int shmId;
 char *shmPtr;
 key_t semkey;
@@ -19,7 +21,7 @@ void closeSharedMemory(void);
 
 
 typedef struct commData{
-	char *msg;
+	char msg[CHAR_BUFFER];
 	int receive1;
 	int receive2;
 }
@@ -47,7 +49,7 @@ int main () {
 }
 
 void retrieveSmKey(void){
-	if ((semkey = ftok(path, id)) == (key_t) -1) {
+	if ((semkey = ftok(getcwd(path,CHAR_BUFFER), id)) == (key_t) -1) {
 		perror("IPC error: ftok"); 
 		exit(1);
 	}

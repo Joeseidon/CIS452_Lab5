@@ -6,9 +6,10 @@
 #include <sys/shm.h>
 #include <unistd.h>
 
-#define SIZE 4096
+#define CHAR_BUFFER 256
 
-char *path = "/tmp";
+char path[CHAR_BUFFER];
+int id = 'S';
 int shmId;
 char *shmPtr;
 key_t semkey;
@@ -18,7 +19,7 @@ void openSharedMemory(void);
 void closeSharedMemory(void);
 
 typedef struct commData{
-	char *msg;
+	char msg[CHAR_BUFFER];
 	int receive1;
 	int receive2;
 }
@@ -50,7 +51,7 @@ int main () {
 }
 
 void retrieveSmKey(void){
-	if ((semkey = ftok(path, id)) == (key_t) -1) {
+	if ((semkey = ftok(getcws(path,CHAR_BUFFER), id)) == (key_t) -1) {
 		perror("IPC error: ftok"); 
 		exit(1);
 	}
@@ -59,8 +60,7 @@ void retrieveSmKey(void){
 //Need to update the following two functions to use semkey
 void openSharedMemory(void){
 	if ((shmId =
-         shmget (IPC_PRIVATE, FOO,
-                 IPC_CREAT | S_IRUSR | S_IWUSR)) < 0) {
+         shmget (semKey,sizeof(commData),IPC_CREAT|0666) < 0) {
         perror ("i can't get no..\n");
         exit (1);
     }
