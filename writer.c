@@ -26,7 +26,7 @@ typedef struct commData{
 }commData;
 
 commData *data;
-void *shmPtr;
+commData *shmPtr;
 
 int running = 1;
 
@@ -78,7 +78,8 @@ void openSharedMemory(void){
         perror ("i can't get no..\n");
         exit (1);
     }
-    if ((shmPtr = shmat (shmId, NULL, 0)) == (void *) -1) {
+    shmPtr = (commData *)shmat (shmId, NULL, 0);
+	if((commData)shmPtr == -1) {
         perror ("can't attach\n");
         exit (1);
     }
