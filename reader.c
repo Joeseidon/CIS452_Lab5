@@ -14,7 +14,7 @@ char path[CHAR_BUFFER];
 int id = 'S';
 int shmId;
 
-key_t semkey;
+key_t shmkey;
 
 void retrieveSmKey(void);
 void openSharedMemory(void);
@@ -38,7 +38,7 @@ int main () {
 	retrieveSmKey();
 	
 	while(running){
-		printf("Key retrieved: %d\n",semkey);
+		printf("Key retrieved: %d\n",shmkey);
 		
 		openSharedMemory();
 		//check for new input by checking receive flag
@@ -62,14 +62,14 @@ int main () {
 
 void retrieveSmKey(void){
 	getcwd(path,CHAR_BUFFER);
-	if ((semkey = ftok(path, id)) == (key_t) -1) {
+	if ((shmkey = ftok(path, id)) == (key_t) -1) {
 		perror("IPC error: ftok"); 
 		exit(1);
 	}
 }
-//Need to update the following two functions to use semkey
+//Need to update the following two functions to use shmkey
 void openSharedMemory(void){
-	if ((shmId = shmget(semkey,sizeof(data),0666) < 0)) {
+	if ((shmId = shmget(shmkey,sizeof(data),0666) < 0)) {
         perror ("i can't get no..\n");
         exit (1);
     }

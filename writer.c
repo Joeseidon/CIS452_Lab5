@@ -14,7 +14,7 @@ char path[CHAR_BUFFER];
 int id = 'S';
 int shmId;
 
-key_t semkey;
+key_t shmkey;
 
 void retrieveSmKey(void);
 void openSharedMemory(void);
@@ -26,7 +26,7 @@ typedef struct commData{
 	int receive2;
 }commData;
 
-commData *data;
+commData data;
 commData *shmPtr;
 
 int running = 1;
@@ -38,7 +38,7 @@ int main () {
 	
 	while(running){
 		
-		printf("Key retrieved: %d\n",semkey);
+		printf("Key retrieved: %d\n",shmkey);
 		
 		openSharedMemory();
 		
@@ -67,15 +67,15 @@ int main () {
 
 void retrieveSmKey(void){
 	getcwd(path,CHAR_BUFFER);
-	if ((semkey = ftok(".", id)) == (key_t) -1) {
+	if ((shmkey = ftok(path, id)) == (key_t) -1) {
 		perror("IPC error: ftok"); 
 		exit(1);
 	}
 }
 
-//Need to update the following two functions to use semkey
+//Need to update the following two functions to use shmkey
 void openSharedMemory(void){
-	if ((shmId = shmget(semkey,sizeof(shmPtr),IPC_CREAT|0666) < 0)) {
+	if ((shmId = shmget(shmkey,sizeof(data),IPC_CREAT|0666) < 0)) {
         perror ("i can't get no..\n");
         exit (1);
     }
