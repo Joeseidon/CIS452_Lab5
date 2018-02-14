@@ -42,7 +42,7 @@ int main () {
 		openSharedMemory();
 		
 		//write to memory
-		strcpy(((commData)shmPtr)->msg,"This is a test");
+		//strcpy(((commData)shmPtr)->msg,"This is a test");
 		
 		
 		
