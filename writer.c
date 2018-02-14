@@ -6,6 +6,7 @@
 #include <sys/shm.h>
 #include <unistd.h>
 #include <string.h>
+#inclide <errno.h>
 
 #define CHAR_BUFFER 256
 
@@ -80,6 +81,7 @@ void openSharedMemory(void){
     }
     if ((shmPtr = (commData *)shmat (shmId, NULL, 0)) == (void *) -1) {
         perror ("can't attach\n");
+		printf("%s\n",strerror(errno));
         exit (1);
     }
 }
