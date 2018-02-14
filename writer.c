@@ -67,7 +67,7 @@ int main () {
 
 void retrieveSmKey(void){
 	getcwd(path,CHAR_BUFFER);
-	if ((semkey = ftok(path, id)) == (key_t) -1) {
+	if ((semkey = ftok(".", id)) == (key_t) -1) {
 		perror("IPC error: ftok"); 
 		exit(1);
 	}
