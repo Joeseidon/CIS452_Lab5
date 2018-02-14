@@ -6,7 +6,7 @@
 #include <sys/shm.h>
 #include <unistd.h>
 #include <string.h>
-#inclide <errno.h>
+#include <errno.h>
 
 #define CHAR_BUFFER 256
 
