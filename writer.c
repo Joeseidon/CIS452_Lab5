@@ -21,7 +21,7 @@ void openSharedMemory(void);
 void closeSharedMemory(void);
 
 typedef struct commData{
-	char *msg;
+	char msg[CHAR_BUFFER];
 	int receive1;
 	int receive2;
 }commData;
@@ -38,12 +38,12 @@ int main () {
 	
 	while(running){
 		
-		printf("Key retrieved: %d\n",shmkey);
+		printf("Key retrieved: %x\n",shmkey);
 		
 		openSharedMemory();
 		
 		//write to memory
-		strcpy(shmPtr->msg,"This is a test");
+	//	strcpy(shmPtr->msg,"This is a test");
 		
 		
 		
@@ -53,9 +53,9 @@ int main () {
 		
 		//reset receive flags
 		
-		printf("Waiting for Readers...\n");
-		while(1)
-			;
+	//	printf("Waiting for Readers...\n");
+	//	while(1)
+	//		;
 		
 		//check receive1 and receive2
 		//once both are 1 accept new input message		
@@ -67,6 +67,7 @@ int main () {
 
 void retrieveSmKey(void){
 	getcwd(path,CHAR_BUFFER);
+	printf("%s\n",path);
 	if ((shmkey = ftok(path, id)) == (key_t) -1) {
 		perror("IPC error: ftok"); 
 		exit(1);
@@ -75,10 +76,14 @@ void retrieveSmKey(void){
 
 //Need to update the following two functions to use shmkey
 void openSharedMemory(void){
-	if ((shmId = shmget(shmkey,sizeof(&data),IPC_CREAT|0666) < 0)) {
-        perror ("i can't get no..\n");
+	printf("%x\n",shmkey);	
+if ((shmId = shmget(shmkey,sizeof(commData),IPC_CREAT|S_IRUSR|S_IWUSR)) < 0) {
+        printf("id: %d\n",shmId);
+	perror ("i can't get no..\n");
         exit (1);
     }
+	perror("cant get\n");
+	printf("%d\n",shmId);
     if ((shmPtr = (commData *)shmat (shmId, NULL, 0)) == (void *) -1) {
         perror ("can't attach\n");
 		printf("%s\n",strerror(errno));
