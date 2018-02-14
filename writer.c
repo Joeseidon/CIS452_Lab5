@@ -20,7 +20,7 @@ void openSharedMemory(void);
 void closeSharedMemory(void);
 
 typedef struct commData{
-	char msg[CHAR_BUFFER];
+	char *msg;
 	int receive1;
 	int receive2;
 }commData;
@@ -80,7 +80,7 @@ void openSharedMemory(void){
     }
     if ((shmPtr = (commData *)shmat (shmId, NULL, 0)) == (void *) -1) {
         perror ("can't attach\n");
-        //exit (1);
+        exit (1);
     }
 }
 
