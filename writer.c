@@ -33,6 +33,7 @@ int main () {
 	
 	while(running){
 		
+		printf("Key retrieved: %d\n",semkey);
 		
 		//wait for user input
 		
@@ -41,6 +42,8 @@ int main () {
 		//reset receive flags
 		
 		printf("Waiting for Readers...\n");
+		while(1)
+			;
 		
 		//check receive1 and receive2
 		//once both are 1 accept new input message		

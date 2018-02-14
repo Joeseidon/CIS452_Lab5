@@ -34,6 +34,7 @@ int main () {
 	retrieveSmKey();
 	
 	while(running){
+		printf("Key retrieved: %d\n",semkey);
 		//check for new input by checking receive flag
 		
 		//print new message
@@ -41,6 +42,10 @@ int main () {
 		//increment flag
 
 		//wait till flag reset to 0, indicating new msg
+		
+		printf("Waiting for writer .. \n");
+		while(1)
+			;
 		
 	
 	}
