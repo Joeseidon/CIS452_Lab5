@@ -89,27 +89,31 @@ int main () {
 	retrieveSmKey();
 	
 	// For debugging.
-	printf("Point A - Waiting for Shared Memory. \n");
+	// printf("Point A - Waiting for Shared Memory. \n");
 	
 	// Wait for shared memory to be available.
 	// "Create" and attach the shared memory.
+	// TODO - Doesn't work. But DOES disallow running this without the writer.
 	openSharedMemory();
 	while (shmId < 0) {
         openSharedMemory();
     }
     
     // For debugging.
-	printf("Point B - Opened Memory. \n");
+	// printf("Point B - Opened Memory. \n");
 	
 	// Tell shared memory of presence.
 	shmPtr->reader1Present = 1;
 	
 	// For debugging.
-	printf("Point C - Waiting for other reader. \n");
+	// printf("Point C - Waiting for other reader. \n");
 	
 	// Wait for both readers to be present.
-	while (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0)
-	    ;
+	while (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
+	    sleep(1);
+        // printf("Reader-1 Status: %d\n", shmPtr->reader1Present);
+        printf("Reader-2 Status: %d\n", shmPtr->reader2Present);
+    }
 	
 	// Loop until the user types "quit" on the other console.
 	
@@ -120,17 +124,17 @@ int main () {
 		    ;
 		
 		// For debugging.
-		printf("Point D - Passed Initial Wait. \n");
+		// printf("Point D - Passed Initial Wait. \n");
 		
 		// Print the message, change flag.
 		if (shmPtr->receive1 == 0) {
 		    // If receives "quit" end the reader.
-		    if (strcmp(shmPtr->msg, "quit") == 1) {
+		    if (strcmp(shmPtr->msg, "quit") == 0) {
 		        printf("Writer sent a close command...\n");
 		        running = 0;
 		    }
 		    else {
-		        sleep(100);
+		        sleep(1);
 		        printf("Message: %s\n", shmPtr->msg);
 		        shmPtr->receive1 = 1;
 		    }

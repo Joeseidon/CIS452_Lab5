@@ -78,9 +78,6 @@ int main () {
     // User-entry holder string.
     char userEntry[CHAR_BUFFER];
 
-    // TODO - The shared memory may be better to have only created once, to be
-    // later destroyed once.
-
     // A & B. Create and attach the shared memory to process address space.
     openSharedMemory();
 
@@ -91,6 +88,15 @@ int main () {
     // Reset receive flags to "nothing sent yet."
     shmPtr->receive1 = -1;
     shmPtr->receive2 = -1;
+
+    // Wait for the two readers.
+    printf("Wait for the two readers...\n");
+    while (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
+        sleep(1);
+        // printf("Reader-1 Status: %d\n", shmPtr->reader1Present);
+        // printf("Reader-2 Status: %d\n", shmPtr->reader2Present);
+    }
+    printf("Ready.\n");
 
     // Loop until the user types "quit".
     int running = 1;
