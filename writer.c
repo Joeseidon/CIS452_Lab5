@@ -93,7 +93,7 @@ int main () {
     // A & B. Create and attach the shared memory to process address space.
     openSharedMemory();
 
-    // Set the presence of readers to default "Not Available". 
+    // Set the presence of readers to default "Not Available".
     shmPtr->reader1Present = 0;
     shmPtr->reader2Present = 0;
 
@@ -122,13 +122,13 @@ int main () {
         fgets(userEntry, CHAR_BUFFER, stdin);
 
         // To leave the program. Leave loop to avoid new creation of memory.
-        if ( strcmp(userEntry, "quit\n") == 0 || 
-                strcmp(userEntry, "Quit\n") == 0 || 
+        if ( strcmp(userEntry, "quit\n") == 0 ||
+                strcmp(userEntry, "Quit\n") == 0 ||
                 hasBeenInterrupted == 1) {
             strcpy(userEntry, "quit\n");
-            
+
             printf("Point A.\n");
-            
+
             running = 0;
         }
 
@@ -158,7 +158,7 @@ int main () {
             // Run the exit instructions for this loop.
             if (shmPtr->receive1 == 0  || shmPtr->receive2 == 0 ||
                             shmPtr->receive1 == -1 || shmPtr->receive2 == -1 ) {
-                shouldLeave = 1;    
+                shouldLeave = 1;
             }
         }
     }
@@ -169,7 +169,7 @@ int main () {
     closeSharedMemory();
 
     // For debugging.
-	printf("\nAfter the closing of memory.\n");
+    printf("\nAfter the closing of memory.\n");
 
     return 0;
 }

@@ -77,64 +77,64 @@ int running = 1;
 /* The program's main process. */
 
 int main () {
-	
-	// Assign Signal Handler
+
+    // Assign Signal Handler
     signal (SIGINT, mainCloseSignalHandler);
-	
-	// Simple Prompt.
+
+    // Simple Prompt.
     printf("\nText entered on the other process will be seen here.\n\n");
-	
-	// Generates a shared-memory "key."
-	retrieveSmKey();
-	
-	// Wait for shared memory to be available.
-	// "Create" and attach the shared memory.
-	while (sharedMemorySetup == 0) {
+
+    // Generates a shared-memory "key."
+    retrieveSmKey();
+
+    // Wait for shared memory to be available.
+    // "Create" and attach the shared memory.
+    while (sharedMemorySetup == 0) {
         openSharedMemory();
     }
-	
-	// Tell shared memory of presence.
-	shmPtr->reader1Present = 1;
-	
-	// Wait for both readers to be present.
-	printf("\n");
-	if (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
-	    while (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
-	        sleep(2);
+
+    // Tell shared memory of presence.
+    shmPtr->reader1Present = 1;
+
+    // Wait for both readers to be present.
+    printf("\n");
+    if (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
+        while (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
+            sleep(2);
             printf("  Reader-2 Status: %d\n", shmPtr->reader2Present);
         }
-	    printf("\n");
+        printf("\n");
     }
-    
-	// Loop until the user types "quit" on the other console.
-	while (running) {
-		
-		// If nothing has been sent yet, wait here.
-		while (shmPtr->receive1 == -1 && running == 1)
-		    ;
-		
-		// Print the message, change flag.
-		if (shmPtr->receive1 == 0) {
-		    // If receives "quit" end the reader.
-		    if (strcmp(shmPtr->msg, "quit\n") == 0) {
-		        printf("\nWriter sent a close command...\n");
-		        running = 0;
-		    }
-		    else {
-		        sleep(1);
-		        printf("Message: %s", shmPtr->msg);
-		        shmPtr->receive1 = 1;
-		    }
-		}
-	}
-	
-	// Detach and deallocate shared memory.
+
+    // Loop until the user types "quit" on the other console.
+    while (running) {
+
+        // If nothing has been sent yet, wait here.
+        while (shmPtr->receive1 == -1 && running == 1)
+            ;
+
+        // Print the message, change flag.
+        if (shmPtr->receive1 == 0) {
+            // If receives "quit" end the reader.
+            if (strcmp(shmPtr->msg, "quit\n") == 0) {
+                printf("\nWriter sent a close command...\n");
+                running = 0;
+            }
+            else {
+                sleep(1);
+                printf("Message: %s", shmPtr->msg);
+                shmPtr->receive1 = 1;
+            }
+        }
+    }
+
+    // Detach and deallocate shared memory.
     closeSharedMemory();
-	
-	// For debugging.
-	// printf("After the closing of memory.\n");
-	
-	return 0;
+
+    // For debugging.
+    // printf("After the closing of memory.\n");
+
+    return 0;
 }
 
 // Retrieve a shared-memory key.
@@ -172,14 +172,14 @@ void openSharedMemory(void) {
         // printf("%s\n", strerror(errno));
         return;
     }
-    
+
     // The setup was successful.
     sharedMemorySetup = 1;
-    
+
     return;
 }
 
-// Reader Version - Detaches from the shared-memory. 
+// Reader Version - Detaches from the shared-memory.
 void closeSharedMemory(void) {
     // Detaches from the shared memory segment.
     if (shmdt (shmPtr) < 0) {
