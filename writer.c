@@ -36,6 +36,7 @@ http://www.cis.gvsu.edu/~dulimarh/CS452/Labs/Lab05-SharedMem/
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <signal.h>
 
 #define CHAR_BUFFER 256
 
@@ -52,6 +53,10 @@ void retrieveSmKey(void);
 void openSharedMemory(void);
 void closeSharedMemory(void);
 
+/* Declaring signal hanlder. */
+
+void mainCloseSignalHandler(int);
+
 /* Defining and declaring the shared memory structure. */
 
 typedef struct commData{
@@ -63,9 +68,16 @@ typedef struct commData{
 } commData;
 commData *shmPtr;
 
+/* To manage keyboard interrupt. */
+
+int hasBeenInterrupted = 0;
+
 /* The program's main process. */
 
 int main () {
+
+    // Assign Signal Handler
+    signal (SIGINT, mainCloseSignalHandler);
 
     // Simple Prompt.
     printf("\n");
@@ -90,33 +102,34 @@ int main () {
     shmPtr->receive2 = -1;
 
     // Wait for the two readers.
+    printf("\n");
     printf("Wait for the two readers...\n");
     while (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
         sleep(1);
         // printf("Reader-1 Status: %d\n", shmPtr->reader1Present);
         // printf("Reader-2 Status: %d\n", shmPtr->reader2Present);
     }
-    printf("Ready.\n");
+    printf("Ready.\n\n");
 
     // Loop until the user types "quit".
     int running = 1;
     while (running) {
 
         // Repeated User-Prompt.
-        printf("\n");
         printf("Enter Text: ");
 
         // Waits for user-input for test, OR "quit" to exit.
         fgets(userEntry, CHAR_BUFFER, stdin);
 
         // To leave the program. Leave loop to avoid new creation of memory.
-        if (strcmp(userEntry, "quit") == 0 || strcmp(userEntry, "Quit") == 0) {
+        if ( strcmp(userEntry, "quit\n") == 0 || 
+                strcmp(userEntry, "Quit\n") == 0 || 
+                hasBeenInterrupted == 1) {
+            strcpy(userEntry, "quit\n");
             
-            // Send message of "quit" to readers.
-            strcpy(shmPtr->msg, "quit");
-            sleep(100);
+            printf("Point A.\n");
             
-            break;
+            running = 0;
         }
 
         // Write to memory.
@@ -130,8 +143,8 @@ int main () {
         // Wait for both readers to get the message.
         int receiveToggle1 = 0;
         int receiveToggle2 = 0;
-        while ( shmPtr->receive1 == 0  || shmPtr->receive2 == 0 ||
-                shmPtr->receive1 == -1 || shmPtr->receive2 == -1 ) {
+        int shouldLeave = 0;
+        while (shouldLeave == 0) {
             // If the reader changed the flag and we haven't seen it yet.
             if (shmPtr->receive1 == 1 && receiveToggle1 == 0) {
                 printf("  Reader1 viewed message!\n");
@@ -142,13 +155,21 @@ int main () {
                 printf("  Reader2 viewed message!\n");
                 receiveToggle2 = 1;
             }
+            // Run the exit instructions for this loop.
+            if (shmPtr->receive1 == 0  || shmPtr->receive2 == 0 ||
+                            shmPtr->receive1 == -1 || shmPtr->receive2 == -1 ) {
+                shouldLeave = 1;    
+            }
         }
     }
 
-    // Outside loop, run the closing instructions.
+    /* Outside entry-loop, run the closing instructions. */
 
     // Detach and deallocate shared memory.
     closeSharedMemory();
+
+    // For debugging.
+	printf("\nAfter the closing of memory.\n");
 
     return 0;
 }
@@ -178,10 +199,10 @@ void openSharedMemory(void) {
     }
 
     // For debugging.
-    printf("shmkey: %x\n",shmkey);
+    printf("  shmkey: %x\n",shmkey);
 
     // For debugging.
-    printf("shmId: %d\n",shmId);
+    printf("  shmId: %d\n",shmId);
 
     // Attach to the new shared memory segment.
     if ((shmPtr = (commData *)shmat (shmId, NULL, 0)) == (void *) -1) {
@@ -189,6 +210,7 @@ void openSharedMemory(void) {
         printf("%s\n",strerror(errno));
         exit (1);
     }
+
 }
 
 // Writer Version - Detaches and deallocates the shared-memory.
@@ -204,4 +226,19 @@ void closeSharedMemory(void) {
         perror ("Failed to deallocate.\n");
         exit (1);
     }
+}
+
+// Handling "CTRL-C" exit.
+void mainCloseSignalHandler (int sigNum) {
+
+    printf("\n");
+    printf("Closing due to interrupt...\n");
+
+    // Stops the main() loop.
+    hasBeenInterrupted = 1;
+
+    // Throws an error at the fgets() in main.
+    raise(SIGSTOP);
+
+    return;
 }

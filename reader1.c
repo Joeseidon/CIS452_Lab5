@@ -47,6 +47,7 @@ int shmId;
 key_t shmkey;
 int id = 'S';
 char path[CHAR_BUFFER];
+int sharedMemorySetup = 0;
 
 /* Declaring the functions used for shared-memory-managment. */
 
@@ -81,61 +82,47 @@ int main () {
     signal (SIGINT, mainCloseSignalHandler);
 	
 	// Simple Prompt.
-    printf("\n");
-    printf("Text entered on the other process will be seen here.\n");
-    printf("\n");
+    printf("\nText entered on the other process will be seen here.\n\n");
 	
 	// Generates a shared-memory "key."
 	retrieveSmKey();
 	
-	// For debugging.
-	// printf("Point A - Waiting for Shared Memory. \n");
-	
 	// Wait for shared memory to be available.
 	// "Create" and attach the shared memory.
-	// TODO - Doesn't work. But DOES disallow running this without the writer.
-	openSharedMemory();
-	while (shmId < 0) {
+	while (sharedMemorySetup == 0) {
         openSharedMemory();
     }
-    
-    // For debugging.
-	// printf("Point B - Opened Memory. \n");
 	
 	// Tell shared memory of presence.
 	shmPtr->reader1Present = 1;
 	
-	// For debugging.
-	// printf("Point C - Waiting for other reader. \n");
-	
 	// Wait for both readers to be present.
-	while (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
-	    sleep(1);
-        // printf("Reader-1 Status: %d\n", shmPtr->reader1Present);
-        printf("Reader-2 Status: %d\n", shmPtr->reader2Present);
+	printf("\n");
+	if (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
+	    while (shmPtr->reader1Present == 0 || shmPtr->reader2Present == 0) {
+	        sleep(2);
+            printf("  Reader-2 Status: %d\n", shmPtr->reader2Present);
+        }
+	    printf("\n");
     }
-	
+    
 	// Loop until the user types "quit" on the other console.
-	
 	while (running) {
 		
 		// If nothing has been sent yet, wait here.
 		while (shmPtr->receive1 == -1 && running == 1)
 		    ;
 		
-		// For debugging.
-		// printf("Point D - Passed Initial Wait. \n");
-		
 		// Print the message, change flag.
 		if (shmPtr->receive1 == 0) {
 		    // If receives "quit" end the reader.
-		    if (strcmp(shmPtr->msg, "quit") == 0) {
-		        printf("Writer sent a close command...\n");
+		    if (strcmp(shmPtr->msg, "quit\n") == 0) {
+		        printf("\nWriter sent a close command...\n");
 		        running = 0;
 		    }
 		    else {
 		        sleep(1);
-		        printf("Message: %s\n", shmPtr->msg);
+		        printf("Message: %s", shmPtr->msg);
 		        shmPtr->receive1 = 1;
 		    }
 		}
@@ -143,6 +130,9 @@ int main () {
 	
 	// Detach and deallocate shared memory.
     closeSharedMemory();
+	
+	// For debugging.
+	// printf("After the closing of memory.\n");
 	
 	return 0;
 }
@@ -165,9 +155,9 @@ void openSharedMemory(void) {
     // Find the shared memory segment.
     if ((shmId
              = shmget(shmkey,sizeof(commData),S_IRUSR|S_IWUSR)) < 0) {
-        printf("id: %d\n", shmId);
-        perror ("Failed to create new memory segment.\n");
-        exit (1);
+        // printf("id: %d\n", shmId);
+        // perror ("Failed to create new memory segment.\n");
+        return;
     }
 
     // For debugging.
@@ -178,10 +168,15 @@ void openSharedMemory(void) {
 
     // Attach to the new shared memory segment.
     if ((shmPtr = (commData *)shmat (shmId, NULL, 0)) == (void *) -1) {
-        perror ("Failed to attach.\n");
-        printf("%s\n", strerror(errno));
-        exit (1);
+        // perror ("Failed to attach.\n");
+        // printf("%s\n", strerror(errno));
+        return;
     }
+    
+    // The setup was successful.
+    sharedMemorySetup = 1;
+    
+    return;
 }
 
 // Reader Version - Detaches from the shared-memory. 
@@ -196,6 +191,7 @@ void closeSharedMemory(void) {
 // Dispatch-Thread use, instrumental in smooth-exit on user's "CTRL-C".
 void mainCloseSignalHandler (int sigNum) {
 
+    printf("\n");
     printf ("Closing due to interrupt...\n");
 
     // Stops the main() loop.
